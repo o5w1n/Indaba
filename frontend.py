@@ -16,7 +16,7 @@ index = faiss.read_index(INDEX_FILE)
 with open(CHUNKS_FILE, "rb") as f:
     chunks = pickle.load(f)
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key=st.secrets["grok"]["api_key"])
 
 def search_index(query, k=10):
     q_vec = embedder.encode([query]).astype('float32')
