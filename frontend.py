@@ -29,6 +29,7 @@ import pickle
 import faiss
 import os
 from groq import Groq
+import torch
 
 # Constants
 INDEX_FILE = "faiss_index.bin"
@@ -38,10 +39,15 @@ CHUNKS_FILE = "chunks.pkl"
 if 'embedder' not in st.session_state:
     try:
         from sentence_transformers import SentenceTransformer
-        st.session_state.embedder = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+        # Force CPU execution and disable meta tensor optimization
+        torch.set_grad_enabled(False)
+        device = torch.device('cpu')
+        st.session_state.embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        st.session_state.embedder.to(device)
     except Exception as e:
         st.error(f"Failed to load SentenceTransformer model: {str(e)}")
         st.stop()
+
 
 # Load index and chunks with error handling
 try:
