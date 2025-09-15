@@ -1,27 +1,78 @@
+# import streamlit as st
+# import pickle
+# import faiss
+# from sentence_transformers import SentenceTransformer
+# from groq import Groq
+# import os
+# # from dotenv import load_dotenv
+
+# # load_dotenv()
+
+# INDEX_FILE = "faiss_index.bin"
+# CHUNKS_FILE = "chunks.pkl"
+# embedder = SentenceTransformer("all-MiniLM-L6-v2",  device="cpu")
+
+# index = faiss.read_index(INDEX_FILE)
+# with open(CHUNKS_FILE, "rb") as f:
+#     chunks = pickle.load(f)
+
+# client = Groq(api_key=st.secrets["grok"]["api_key"])
+
+# def search_index(query, k=10):
+#     q_vec = embedder.encode([query]).astype('float32')
+#     D, I = index.search(q_vec, k)
+#     return [chunks[i] for i in I[0]]
+
+
 import streamlit as st
 import pickle
 import faiss
-from sentence_transformers import SentenceTransformer
-from groq import Groq
 import os
-# from dotenv import load_dotenv
+from groq import Groq
 
-# load_dotenv()
-
+# Constants
 INDEX_FILE = "faiss_index.bin"
 CHUNKS_FILE = "chunks.pkl"
-embedder = SentenceTransformer("all-MiniLM-L6-v2",  device="cpu")
 
-index = faiss.read_index(INDEX_FILE)
-with open(CHUNKS_FILE, "rb") as f:
-    chunks = pickle.load(f)
+# Initialize session state for model
+if 'embedder' not in st.session_state:
+    try:
+        from sentence_transformers import SentenceTransformer
+        st.session_state.embedder = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+    except Exception as e:
+        st.error(f"Failed to load SentenceTransformer model: {str(e)}")
+        st.stop()
 
-client = Groq(api_key=st.secrets["grok"]["api_key"])
+# Load index and chunks with error handling
+try:
+    index = faiss.read_index(INDEX_FILE)
+    with open(CHUNKS_FILE, "rb") as f:
+        chunks = pickle.load(f)
+except FileNotFoundError as e:
+    st.error(f"Required files not found: {str(e)}")
+    st.stop()
+except Exception as e:
+    st.error(f"Error loading files: {str(e)}")
+    st.stop()
+
+# Initialize Groq client
+try:
+    client = Groq(api_key=st.secrets["grok"]["api_key"])
+except Exception as e:
+    st.error("Failed to initialize Groq client. Please check your API key.")
+    st.stop()
 
 def search_index(query, k=10):
-    q_vec = embedder.encode([query]).astype('float32')
-    D, I = index.search(q_vec, k)
-    return [chunks[i] for i in I[0]]
+    try:
+        q_vec = st.session_state.embedder.encode([query]).astype('float32')
+        D, I = index.search(q_vec, k)
+        return [chunks[i] for i in I[0]]
+    except Exception as e:
+        st.error(f"Error during search: {str(e)}")
+        return []
+
+
+
 
 def generate_answer(question, context_chunks):
     context = "\n\n".join(context_chunks)
