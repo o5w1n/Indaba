@@ -10,12 +10,9 @@ import os
 
 INDEX_FILE = "faiss_index.bin"
 CHUNKS_FILE = "chunks.pkl"
-# embedder = SentenceTransformer("all-MiniLM-L6-v2")device="cpu"
+embedder = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
 
-def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
 
-embedder = load_model()
 
 
 
