@@ -4,9 +4,9 @@ import faiss
 from sentence_transformers import SentenceTransformer
 from groq import Groq
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 INDEX_FILE = "faiss_index.bin"
 CHUNKS_FILE = "chunks.pkl"
