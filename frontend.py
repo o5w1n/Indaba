@@ -131,7 +131,7 @@ if submit_button and question:
         st.write(f"**Chunk {i}:** {chunk[:300]}...")
 
     answer = generate_answer(question, retrieved)
-    st.markdown("### 🤖 Answer")
+    st.markdown("###    🤖 Answer")
     st.write(answer)
 
 
