@@ -39,28 +39,30 @@ CHUNKS_FILE = "chunks.pkl"
 if 'embedder' not in st.session_state:
     try:
         from sentence_transformers import SentenceTransformer
-        # Force CPU execution and disable meta tensor optimization
+        # Disable gradient computation
         torch.set_grad_enabled(False)
-        device = torch.device('cpu')
-        st.session_state.embedder = SentenceTransformer("all-MiniLM-L6-v2")
-        st.session_state.embedder.to(device)
+        
+        # Initialize model with specific parameters
+        model_name = "all-MiniLM-L6-v2"
+        model_kwargs = {
+            'device': 'cpu',
+            'use_auth_token': False,
+            'torch_dtype': torch.float32
+        }
+        
+        st.session_state.embedder = SentenceTransformer(
+            model_name,
+            device='cpu',
+            cache_folder=None  # Disable caching to prevent meta tensor issues
+        )
     except Exception as e:
         st.error(f"Failed to load SentenceTransformer model: {str(e)}")
         st.stop()
 
 
-# Load index and chunks with error handling
-try:
-    index = faiss.read_index(INDEX_FILE)
-    with open(CHUNKS_FILE, "rb") as f:
-        chunks = pickle.load(f)
-except FileNotFoundError as e:
-    st.error(f"Required files not found: {str(e)}")
-    st.stop()
-except Exception as e:
-    st.error(f"Error loading files: {str(e)}")
-    st.stop()
 
+
+        
 # Initialize Groq client
 try:
     client = Groq(api_key=st.secrets["grok"]["api_key"])
