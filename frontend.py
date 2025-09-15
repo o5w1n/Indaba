@@ -10,7 +10,7 @@ import os
 
 INDEX_FILE = "faiss_index.bin"
 CHUNKS_FILE = "chunks.pkl"
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
+embedder = SentenceTransformer("all-MiniLM-L6-v2",  device="cpu")
 
 index = faiss.read_index(INDEX_FILE)
 with open(CHUNKS_FILE, "rb") as f:
