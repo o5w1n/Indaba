@@ -124,15 +124,23 @@ with st.form(key="chat_form", clear_on_submit=True):
 # for i, chunk in enumerate(retrieved, 1):
 #     st.write(f"**Chunk {i}:** {chunk[:300]}...")
 
+# if submit_button and question:
+#     retrieved = search_index(question)
+#     st.markdown("### 🔍 Retrieved Chunks")
+#     for i, chunk in enumerate(retrieved, 1):
+#         st.write(f"**Chunk {i}:** {chunk[:300]}...")
+
+#     answer = generate_answer(question, retrieved)
+#     st.markdown("###    🤖 Answer")
+#     st.write(answer)
+
 if submit_button and question:
     retrieved = search_index(question)
-    st.markdown("### 🔍 Retrieved Chunks")
-    for i, chunk in enumerate(retrieved, 1):
-        st.write(f"**Chunk {i}:** {chunk[:300]}...")
-
     answer = generate_answer(question, retrieved)
-    st.markdown("###    🤖 Answer")
+
+    st.markdown("### 🤖 Answer")
     st.write(answer)
+
 
 
 if st.button("Clear Chat"):
